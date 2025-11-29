@@ -1,0 +1,35 @@
+{
+  "name": "NLP Solver",
+  "guid": "asc.{8A3C4B2D-9E7F-4A1B-B8C6-D5E4F3A2B1C0}",
+  "baseUrl": "",
+  "variations": [
+    {
+      "description": "NLP Solver by karlbreuer.com",
+      "url": "index.html",
+      "EditorsSupport": ["cell"],
+      "type": "panelRight",
+      "initDataType": "none",
+      "initData": "",
+      "icons": [
+        {
+          "style": "light",
+          "100%": { "normal": "icons/icon.png" },
+          "125%": { "normal": "icons/icon.png" },
+          "150%": { "normal": "icons/icon.png" },
+          "175%": { "normal": "icons/icon.png" },
+          "200%": { "normal": "icons/icon.png" }
+        },
+        {
+          "style": "dark",
+          "100%": { "normal": "icons/icon.png" },
+          "125%": { "normal": "icons/icon.png" },
+          "150%": { "normal": "icons/icon.png" },
+          "175%": { "normal": "icons/icon.png" },
+          "200%": { "normal": "icons/icon.png" }
+        }
+      ],
+      "isDisplayedInViewer": false
+    }
+  ],
+  "version": "1.0.4"
+}

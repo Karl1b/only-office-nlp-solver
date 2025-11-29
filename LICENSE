@@ -5,6 +5,32 @@
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
+Copyright (C) 2025 Karl Breuer
+
+ADDITIONAL TERMS UNDER SECTION 7
+
+Pursuant to Section 7 of the GNU Affero General Public License version 3,
+the following additional terms apply to this software:
+
+Commercial distribution, sale, or offering this software or any derivative
+works as a commercial product or service requires prior written permission
+from Karl Breuer.
+
+For the purposes of this restriction, "commercial use" means:
+- Selling the software or derivative works
+- Offering the software or derivative works as part of a paid service
+- Using the software to generate revenue through licensing or subscriptions
+- Distributing the software as part of a commercial product
+
+Permitted without permission:
+- Internal use within organizations (commercial or non-commercial)
+- Use for educational, research, or personal purposes
+- Modification and distribution under these same terms
+- Hosting services where the software itself is not sold
+
+For commercial licensing inquiries, please contact: mail@karlbreuer.com
+
+
                             Preamble
 
   The GNU Affero General Public License is a free, copyleft license for
