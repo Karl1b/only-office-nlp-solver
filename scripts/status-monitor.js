@@ -34,14 +34,19 @@
     const startBtn = document.getElementById("startBtn");
 
     // Update status text
-    const statusStr = status.current_status || status.CurrentStatus || "unknown";
+    const statusStr =
+      status.current_status || status.CurrentStatus || "unknown";
     statusText.textContent = capitalize(statusStr);
 
     // Update status class
     statusText.className = "status-value";
     if (statusStr === "running" || statusStr === "fitting") {
       statusText.classList.add("running");
-    } else if (statusStr === "ready" || statusStr === "done" || statusStr === "complete") {
+    } else if (
+      statusStr === "ready" ||
+      statusStr === "done" ||
+      statusStr === "complete"
+    ) {
       statusText.classList.add("ready");
     } else if (statusStr === "error") {
       statusText.classList.add("error");
@@ -55,10 +60,32 @@
       currentFit.textContent = "—";
     }
 
+    // Update iterations
+    const iterations = status.iterations || status.Iterations;
+    const currentIterations = document.getElementById("currentIterations");
+    if (iterations !== undefined && iterations !== null) {
+      currentIterations.textContent = iterations.toLocaleString();
+    } else {
+      currentIterations.textContent = "—";
+    }
+
+    // Update fit time
+    const fitTime = status.fit_time || status.FitTime;
+    const currentFitTime = document.getElementById("currentFitTime");
+    if (fitTime !== undefined && fitTime !== null && fitTime > 0) {
+      currentFitTime.textContent = fitTime.toFixed(2) + "s";
+    } else {
+      currentFitTime.textContent = "—";
+    }
+
     // Update parameters
-    const params = status.current_paramters || status.CurrentParamters || status.current_parameters || [];
+    const params =
+      status.current_paramters ||
+      status.CurrentParamters ||
+      status.current_parameters ||
+      [];
     if (params && params.length > 0) {
-      currentParams.textContent = params.map(p => formatNumber(p)).join(", ");
+      currentParams.textContent = params.map((p) => formatNumber(p)).join(", ");
     } else {
       currentParams.textContent = "—";
     }

@@ -4,7 +4,8 @@
   let parameterCount = 0;
 
   // SVG icon for cell picker
-  const pickerIconSVG = '<svg viewBox="0 0 24 24"><path d="M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm2 0h6v6H5V5zm8 0h6v6h-6V5zm-8 8h6v6H5v-6zm8 0h6v6h-6v-6z"/></svg>';
+  const pickerIconSVG =
+    '<svg viewBox="0 0 24 24"><path d="M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm2 0h6v6H5V5zm8 0h6v6h-6V5zm-8 8h6v6H5v-6zm8 0h6v6h-6v-6z"/></svg>';
 
   // Helper: Convert column letter to number (A=1, B=2, ..., Z=26, AA=27, etc.)
   function colToNum(col) {
@@ -42,13 +43,28 @@
     const endRow = parseInt(endMatch[2]);
 
     const cells = [];
-    for (let c = Math.min(startCol, endCol); c <= Math.max(startCol, endCol); c++) {
-      for (let r = Math.min(startRow, endRow); r <= Math.max(startRow, endRow); r++) {
+    for (
+      let c = Math.min(startCol, endCol);
+      c <= Math.max(startCol, endCol);
+      c++
+    ) {
+      for (
+        let r = Math.min(startRow, endRow);
+        r <= Math.max(startRow, endRow);
+        r++
+      ) {
         cells.push(numToCol(c) + r);
       }
     }
     return cells;
   }
+
+  window.getIterations = function () {
+    const input = document.getElementById("iterationsInput");
+    if (!input) return 1000;
+    const val = parseInt(input.value, 10);
+    return isNaN(val) || val <= 0 ? 1000 : val;
+  };
 
   // Pick target cell from current selection
   window.pickTargetCell = function () {
@@ -115,13 +131,12 @@
         <input type="text" class="param-cell" placeholder="B1" value="${cellValue}" />
         <button class="remove-btn" onclick="removeParameterRow('${rowId}')">×</button>
       </div>
-      <div class="param-bounds-row">
-        <span class="bounds-label">Min</span>
-        <input type="text" class="param-minmax param-min" placeholder="0" value="${minValue}" />
-        <span class="bounds-label">Max</span>
-        <input type="text" class="param-minmax param-max" placeholder="100" value="${maxValue}" />
-        <span class="bounds-spacer"></span>
-      </div>
+<div class="param-bounds-row">
+  <div class="limit-check"><input type="checkbox" class="param-limit-min" /><label>StrictMin</label></div>
+  <input type="text" class="param-minmax param-min" placeholder="-1" value="${minValue}" />
+  <div class="limit-check"><input type="checkbox" class="param-limit-max" /><label>StrictMax</label></div>
+  <input type="text" class="param-minmax param-max" placeholder="1" value="${maxValue}" />
+</div>
     `;
     container.appendChild(row);
   }
@@ -143,6 +158,8 @@
           cell: cell,
           min_value: minStr !== "" ? parseFloat(minStr) : null,
           max_value: maxStr !== "" ? parseFloat(maxStr) : null,
+          limit_min: row.querySelector(".param-limit-min").checked,
+          limit_max: row.querySelector(".param-limit-max").checked,
         });
       }
     });
@@ -150,7 +167,10 @@
   };
 
   window.startSolver = function () {
-    const addr = document.getElementById("targetCell").value.trim().toUpperCase();
+    const addr = document
+      .getElementById("targetCell")
+      .value.trim()
+      .toUpperCase();
     if (!addr) {
       alert("Please set a target cell first.");
       return;
@@ -192,13 +212,16 @@
         function expandRange(rangeStr) {
           var parts = rangeStr.replace(/\$/g, "").split(":");
           if (parts.length !== 2) return [rangeStr.replace(/\$/g, "")];
-          var start = parts[0], end = parts[1];
+          var start = parts[0],
+            end = parts[1];
           var startMatch = start.match(/([A-Z]+)(\d+)/);
           var endMatch = end.match(/([A-Z]+)(\d+)/);
           if (!startMatch || !endMatch) return [rangeStr.replace(/\$/g, "")];
 
-          var startCol = startMatch[1], startRow = parseInt(startMatch[2]);
-          var endCol = endMatch[1], endRow = parseInt(endMatch[2]);
+          var startCol = startMatch[1],
+            startRow = parseInt(startMatch[2]);
+          var endCol = endMatch[1],
+            endRow = parseInt(endMatch[2]);
 
           function colToNum(col) {
             var num = 0;
@@ -217,7 +240,8 @@
             return col;
           }
 
-          var startColNum = colToNum(startCol), endColNum = colToNum(endCol);
+          var startColNum = colToNum(startCol),
+            endColNum = colToNum(endCol);
           var cells = [];
           for (var c = startColNum; c <= endColNum; c++) {
             for (var r = startRow; r <= endRow; r++) {
@@ -231,7 +255,7 @@
           var maxIterations = 20;
           var parameterCellSet = new Set();
           if (parameterCells && Array.isArray(parameterCells)) {
-            parameterCells.forEach(function(param) {
+            parameterCells.forEach(function (param) {
               if (param.cell) parameterCellSet.add(normalizeRef(param.cell));
             });
           }
@@ -257,7 +281,9 @@
                 uniqueMatches.push(matches[i]);
               }
             }
-            uniqueMatches.sort(function(a, b) { return b.length - a.length; });
+            uniqueMatches.sort(function (a, b) {
+              return b.length - a.length;
+            });
 
             for (var j = 0; j < uniqueMatches.length; j++) {
               var match = uniqueMatches[j];
@@ -273,15 +299,22 @@
                   } else {
                     var cellFormula = getSimpleFormula(cellAddr);
                     if (cellFormula && cellFormula.startsWith("=")) {
-                      expandedFormulas.push("(" + cellFormula.substring(1) + ")");
+                      expandedFormulas.push(
+                        "(" + cellFormula.substring(1) + ")"
+                      );
                     } else {
                       expandedFormulas.push(getCellValue(cellAddr));
                     }
                   }
                 }
                 var replacement = "(" + expandedFormulas.join("+") + ")";
-                var escapedMatch = match.replace(/\$/g, "\\$?").replace(/:/g, "\\s*:\\s*");
-                var rangePattern = new RegExp("SUM\\s*\\(\\s*" + escapedMatch + "\\s*\\)", "gi");
+                var escapedMatch = match
+                  .replace(/\$/g, "\\$?")
+                  .replace(/:/g, "\\s*:\\s*");
+                var rangePattern = new RegExp(
+                  "SUM\\s*\\(\\s*" + escapedMatch + "\\s*\\)",
+                  "gi"
+                );
                 var newResult = result.replace(rangePattern, replacement);
                 if (newResult !== result) {
                   result = newResult;
@@ -299,7 +332,10 @@
                 var formulaContent = "(" + refFormula.substring(1) + ")";
                 var col = normalizedMatch.match(/[A-Z]+/)[0];
                 var row = normalizedMatch.match(/\d+/)[0];
-                var refPattern = new RegExp("\\$?" + col + "\\$?" + row + "(?![0-9])", "g");
+                var refPattern = new RegExp(
+                  "\\$?" + col + "\\$?" + row + "(?![0-9])",
+                  "g"
+                );
                 var newResult = result.replace(refPattern, formulaContent);
                 if (newResult !== result) {
                   result = newResult;
@@ -319,10 +355,15 @@
               var normalized = normalizeRef(matches[i]);
               if (!seen.has(normalized)) {
                 seen.add(normalized);
-                uniqueMatches.push({ original: matches[i], normalized: normalized });
+                uniqueMatches.push({
+                  original: matches[i],
+                  normalized: normalized,
+                });
               }
             }
-            uniqueMatches.sort(function(a, b) { return b.normalized.length - a.normalized.length; });
+            uniqueMatches.sort(function (a, b) {
+              return b.normalized.length - a.normalized.length;
+            });
 
             for (var j = 0; j < uniqueMatches.length; j++) {
               var item = uniqueMatches[j];
@@ -330,7 +371,10 @@
               if (parameterCellSet.has(normalizedRef)) {
                 var col = normalizedRef.match(/[A-Z]+/)[0];
                 var row = normalizedRef.match(/\d+/)[0];
-                var refPattern = new RegExp("\\$?" + col + "\\$?" + row + "(?![0-9])", "g");
+                var refPattern = new RegExp(
+                  "\\$?" + col + "\\$?" + row + "(?![0-9])",
+                  "g"
+                );
                 result = result.replace(refPattern, normalizedRef);
                 continue;
               }
@@ -338,7 +382,10 @@
               if (cellValue !== null) {
                 var col = normalizedRef.match(/[A-Z]+/)[0];
                 var row = normalizedRef.match(/\d+/)[0];
-                var refPattern = new RegExp("\\$?" + col + "\\$?" + row + "(?![0-9])", "g");
+                var refPattern = new RegExp(
+                  "\\$?" + col + "\\$?" + row + "(?![0-9])",
+                  "g"
+                );
                 result = result.replace(refPattern, cellValue);
               }
             }
@@ -356,16 +403,20 @@
           var parameterCells = getParameterCells();
           var paramsJSON = JSON.stringify(parameterCells);
           try {
-            window.goParseInput(res, paramsJSON);
+            var iterations = getIterations();
+            window.goParseInput(res, paramsJSON, iterations.toString());
           } catch (err) {
             console.error("[WASM] Error:", err);
             document.getElementById("statusText").textContent = "Error";
-            document.getElementById("statusText").className = "status-value error";
+            document.getElementById("statusText").className =
+              "status-value error";
             document.getElementById("startBtn").disabled = false;
           }
         } else {
-          document.getElementById("statusText").textContent = "No formula found";
-          document.getElementById("statusText").className = "status-value error";
+          document.getElementById("statusText").textContent =
+            "No formula found";
+          document.getElementById("statusText").className =
+            "status-value error";
           document.getElementById("startBtn").disabled = false;
         }
       }

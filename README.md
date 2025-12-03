@@ -8,7 +8,7 @@ A lightweight nonlinear programming (NLP) solver plugin for OnlyOffice Spreadshe
 
 ## Download
 
-[Download here](https://workupload.com/file/Pg9SwuGUDVW)
+[Download here](https://workupload.com/file/WYN6zT5wYff)
 
 Planning to submit this to the OnlyOffice plugin store soon.
 
