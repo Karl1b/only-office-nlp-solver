@@ -90,6 +90,31 @@
       currentParams.textContent = "—";
     }
 
+    const sideConditions = status.side_conditions || status.SideConditons || [];
+    const sideConditionsDisplay = document.getElementById(
+      "sideConditionsDisplay"
+    );
+    if (sideConditionsDisplay) {
+      if (sideConditions && sideConditions.length > 0) {
+        const conditionsHtml = sideConditions
+          .map((sc, idx) => {
+            const value = formatNumber(sc.value);
+            const inLimits = sc.is_in_limits;
+            const statusIcon = inLimits ? "✓" : "✗";
+            const statusClass = inLimits
+              ? "condition-ok"
+              : "condition-violation";
+            return `<div class="${statusClass}"><span>SC${
+              idx + 1
+            }: ${value} ${statusIcon}</span></div>`;
+          })
+          .join("");
+        sideConditionsDisplay.innerHTML = conditionsHtml;
+      } else {
+        sideConditionsDisplay.textContent = "—";
+      }
+    }
+
     // Enable/disable start button based on status
     if (statusStr === "running" || statusStr === "fitting") {
       startBtn.disabled = true;

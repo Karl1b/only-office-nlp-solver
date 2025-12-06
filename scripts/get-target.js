@@ -2,59 +2,40 @@
   "use strict";
 
   let parameterCount = 0;
+  let sideConditionCount = 0;
 
-  // SVG icon for cell picker
-  const pickerIconSVG =
-    '<svg viewBox="0 0 24 24"><path d="M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm2 0h6v6H5V5zm8 0h6v6h-6V5zm-8 8h6v6H5v-6zm8 0h6v6h-6v-6z"/></svg>';
-
-  // Helper: Convert column letter to number (A=1, B=2, ..., Z=26, AA=27, etc.)
   function colToNum(col) {
     let num = 0;
-    for (let i = 0; i < col.length; i++) {
+    for (let i = 0; i < col.length; i++)
       num = num * 26 + (col.charCodeAt(i) - 64);
-    }
     return num;
   }
 
-  // Helper: Convert number to column letter
   function numToCol(num) {
     let col = "";
     while (num > 0) {
-      const remainder = (num - 1) % 26;
-      col = String.fromCharCode(65 + remainder) + col;
+      const r = (num - 1) % 26;
+      col = String.fromCharCode(65 + r) + col;
       num = Math.floor((num - 1) / 26);
     }
     return col;
   }
 
-  // Expand a range like "A1:A5" into individual cells ["A1", "A2", "A3", "A4", "A5"]
   function expandRange(rangeStr) {
     const normalized = rangeStr.replace(/\$/g, "").toUpperCase();
     const parts = normalized.split(":");
     if (parts.length !== 2) return [normalized];
-
-    const startMatch = parts[0].match(/([A-Z]+)(\d+)/);
-    const endMatch = parts[1].match(/([A-Z]+)(\d+)/);
-    if (!startMatch || !endMatch) return [normalized];
-
-    const startCol = colToNum(startMatch[1]);
-    const endCol = colToNum(endMatch[1]);
-    const startRow = parseInt(startMatch[2]);
-    const endRow = parseInt(endMatch[2]);
-
+    const sm = parts[0].match(/([A-Z]+)(\d+)/),
+      em = parts[1].match(/([A-Z]+)(\d+)/);
+    if (!sm || !em) return [normalized];
+    const sc = colToNum(sm[1]),
+      ec = colToNum(em[1]);
+    const sr = parseInt(sm[2]),
+      er = parseInt(em[2]);
     const cells = [];
-    for (
-      let c = Math.min(startCol, endCol);
-      c <= Math.max(startCol, endCol);
-      c++
-    ) {
-      for (
-        let r = Math.min(startRow, endRow);
-        r <= Math.max(startRow, endRow);
-        r++
-      ) {
+    for (let c = Math.min(sc, ec); c <= Math.max(sc, ec); c++) {
+      for (let r = Math.min(sr, er); r <= Math.max(sr, er); r++)
         cells.push(numToCol(c) + r);
-      }
     }
     return cells;
   }
@@ -66,34 +47,31 @@
     return isNaN(val) || val <= 0 ? 1000 : val;
   };
 
-  // Pick target cell from current selection
   window.pickTargetCell = function () {
     window.Asc.plugin.callCommand(
       function () {
-        const sheet = Api.GetActiveSheet();
-        const selection = sheet.GetSelection();
-        if (!selection) return null;
-        const addr = selection.GetAddress(true, true, "xlA1", false);
+        var sheet = Api.GetActiveSheet();
+        var sel = sheet.GetSelection();
+        if (!sel) return null;
+        var addr = sel.GetAddress(true, true, "xlA1", false);
         return addr ? addr.replace(/\$/g, "").split(":")[0] : null;
       },
       false,
       false,
       function (result) {
-        if (result) {
+        if (result)
           document.getElementById("targetCell").value = result.toUpperCase();
-        }
       }
     );
   };
 
-  // Pick parameter cells from current selection (replaces all existing parameters)
   window.pickParameterRange = function () {
     window.Asc.plugin.callCommand(
       function () {
-        const sheet = Api.GetActiveSheet();
-        const selection = sheet.GetSelection();
-        if (!selection) return null;
-        const addr = selection.GetAddress(true, true, "xlA1", false);
+        var sheet = Api.GetActiveSheet();
+        var sel = sheet.GetSelection();
+        if (!sel) return null;
+        var addr = sel.GetAddress(true, true, "xlA1", false);
         return addr ? addr.replace(/\$/g, "") : null;
       },
       false,
@@ -101,27 +79,58 @@
       function (result) {
         if (result) {
           const cells = expandRange(result);
-          // Clear all existing parameter rows
-          const container = document.getElementById("parametersList");
-          container.innerHTML = "";
+          document.getElementById("parametersList").innerHTML = "";
           parameterCount = 0;
-          // Add a row for each cell in the selection
-          cells.forEach(function (cell) {
-            addParameterRowWithValues(cell, "", "");
-          });
+          cells.forEach((c) => addParameterRowWithValues(c, "", ""));
+        }
+      }
+    );
+  };
+
+  window.pickSideConditionCellForRow = function (rowId) {
+    window.Asc.plugin.callCommand(
+      function () {
+        var sheet = Api.GetActiveSheet();
+        var sel = sheet.GetSelection();
+        if (!sel) return null;
+        var addr = sel.GetAddress(true, true, "xlA1", false);
+        return addr ? addr.replace(/\$/g, "").split(":")[0] : null;
+      },
+      false,
+      false,
+      function (result) {
+        if (result) {
+          const row = document.getElementById(rowId);
+          if (row) {
+            const cellInput = row.querySelector(".condition-cell");
+            if (cellInput) cellInput.value = result.toUpperCase();
+          }
         }
       }
     );
   };
 
   window.addParameterRow = function () {
-    addParameterRowWithValues("", "", "");
+    window.Asc.plugin.callCommand(
+      function () {
+        var sheet = Api.GetActiveSheet();
+        var sel = sheet.GetSelection();
+        if (!sel) return null;
+        var addr = sel.GetAddress(true, true, "xlA1", false);
+        return addr ? addr.replace(/\$/g, "").split(":")[0] : null;
+      },
+      false,
+      false,
+      function (result) {
+        var cellValue = result ? result.toUpperCase() : "";
+        addParameterRowWithValues(cellValue, "", "");
+      }
+    );
   };
 
   function addParameterRowWithValues(cellValue, minValue, maxValue) {
     const container = document.getElementById("parametersList");
     const rowId = `param-${parameterCount++}`;
-
     const row = document.createElement("div");
     row.className = "parameter-row";
     row.id = rowId;
@@ -131,13 +140,12 @@
         <input type="text" class="param-cell" placeholder="B1" value="${cellValue}" />
         <button class="remove-btn" onclick="removeParameterRow('${rowId}')">×</button>
       </div>
-<div class="param-bounds-row">
-  <div class="limit-check"><input type="checkbox" class="param-limit-min" /><label>StrictMin</label></div>
-  <input type="text" class="param-minmax param-min" placeholder="-1" value="${minValue}" />
-  <div class="limit-check"><input type="checkbox" class="param-limit-max" /><label>StrictMax</label></div>
-  <input type="text" class="param-minmax param-max" placeholder="1" value="${maxValue}" />
-</div>
-    `;
+      <div class="param-bounds-row">
+        <div class="limit-check"><input type="checkbox" class="param-limit-min" /><label>StrictMin</label></div>
+        <input type="text" class="param-minmax param-min" placeholder="-1" value="${minValue}" />
+        <div class="limit-check"><input type="checkbox" class="param-limit-max" /><label>StrictMax</label></div>
+        <input type="text" class="param-minmax param-max" placeholder="1" value="${maxValue}" />
+      </div>`;
     container.appendChild(row);
   }
 
@@ -146,16 +154,95 @@
     if (row) row.remove();
   };
 
+  window.addSideConditionRow = function () {
+    window.Asc.plugin.callCommand(
+      function () {
+        var sheet = Api.GetActiveSheet();
+        var sel = sheet.GetSelection();
+        if (!sel) return null;
+        var addr = sel.GetAddress(true, true, "xlA1", false);
+        return addr ? addr.replace(/\$/g, "").split(":")[0] : null;
+      },
+      false,
+      false,
+      function (result) {
+        var cellValue = result ? result.toUpperCase() : "";
+        addSideConditionRowWithValues(cellValue, "", "", true, true);
+      }
+    );
+  };
+
+  function addSideConditionRowWithValues(
+    cellValue,
+    minValue,
+    maxValue,
+    defineMin,
+    defineMax
+  ) {
+    const container = document.getElementById("sideConditionsList");
+    const rowId = `sidecond-${sideConditionCount++}`;
+    const row = document.createElement("div");
+    row.className = "side-condition-row";
+    row.id = rowId;
+    const minChecked = defineMin ? "checked" : "";
+    const maxChecked = defineMax ? "checked" : "";
+    const minDisabled = defineMin ? "" : "disabled";
+    const maxDisabled = defineMax ? "" : "disabled";
+    row.innerHTML = `
+      <div class="param-top-row">
+        <span class="param-label">Cell</span>
+        <input type="text" class="condition-cell" placeholder="C1" value="${cellValue}" />
+        <button class="param-picker-btn" onclick="pickSideConditionCellForRow('${rowId}')" title="Pick cell from spreadsheet">
+          <svg viewBox="0 0 24 24"><path d="M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm2 0h6v6H5V5zm8 0h6v6h-6V5zm-8 8h6v6H5v-6zm8 0h6v6h-6v-6z"/></svg>
+        </button>
+        <button class="remove-btn" onclick="removeSideConditionRow('${rowId}')">×</button>
+      </div>
+      <div class="condition-bounds-row">
+        <div class="limit-check">
+          <input type="checkbox" class="condition-define-min" ${minChecked} onchange="toggleConditionMin('${rowId}')" />
+          <label>DefineMin</label>
+        </div>
+        <input type="text" class="condition-minmax condition-min" placeholder="0" value="${minValue}" ${minDisabled} />
+        <div class="limit-check">
+          <input type="checkbox" class="condition-define-max" ${maxChecked} onchange="toggleConditionMax('${rowId}')" />
+          <label>DefineMax</label>
+        </div>
+        <input type="text" class="condition-minmax condition-max" placeholder="0" value="${maxValue}" ${maxDisabled} />
+      </div>`;
+    container.appendChild(row);
+  }
+
+  window.toggleConditionMin = function (rowId) {
+    const row = document.getElementById(rowId);
+    if (!row) return;
+    const checkbox = row.querySelector(".condition-define-min");
+    const input = row.querySelector(".condition-min");
+    if (checkbox && input) input.disabled = !checkbox.checked;
+  };
+
+  window.toggleConditionMax = function (rowId) {
+    const row = document.getElementById(rowId);
+    if (!row) return;
+    const checkbox = row.querySelector(".condition-define-max");
+    const input = row.querySelector(".condition-max");
+    if (checkbox && input) input.disabled = !checkbox.checked;
+  };
+
+  window.removeSideConditionRow = function (rowId) {
+    const row = document.getElementById(rowId);
+    if (row) row.remove();
+  };
+
   window.getParameterCells = function () {
     const rows = document.querySelectorAll(".parameter-row");
-    const parameters = [];
+    const params = [];
     rows.forEach((row) => {
       const cell = row.querySelector(".param-cell").value.trim().toUpperCase();
       const minStr = row.querySelector(".param-min").value.trim();
       const maxStr = row.querySelector(".param-max").value.trim();
       if (cell) {
-        parameters.push({
-          cell: cell,
+        params.push({
+          cell,
           min_value: minStr !== "" ? parseFloat(minStr) : null,
           max_value: maxStr !== "" ? parseFloat(maxStr) : null,
           limit_min: row.querySelector(".param-limit-min").checked,
@@ -163,24 +250,46 @@
         });
       }
     });
-    return parameters;
+    return params;
+  };
+
+  window.getSideConditions = function () {
+    const rows = document.querySelectorAll(".side-condition-row");
+    const conds = [];
+    rows.forEach((row) => {
+      const cell = row
+        .querySelector(".condition-cell")
+        .value.trim()
+        .toUpperCase();
+      const defineMin = row.querySelector(".condition-define-min").checked;
+      const defineMax = row.querySelector(".condition-define-max").checked;
+      const minStr = row.querySelector(".condition-min").value.trim();
+      const maxStr = row.querySelector(".condition-max").value.trim();
+      if (cell) {
+        conds.push({
+          cell,
+          min_value: defineMin && minStr !== "" ? parseFloat(minStr) : 0,
+          max_value: defineMax && maxStr !== "" ? parseFloat(maxStr) : 0,
+          define_min: defineMin,
+          define_max: defineMax,
+        });
+      }
+    });
+    return conds;
   };
 
   window.startSolver = function () {
-    const addr = document
-      .getElementById("targetCell")
-      .value.trim()
-      .toUpperCase();
+    var addr = document.getElementById("targetCell").value.trim().toUpperCase();
     if (!addr) {
       alert("Please set a target cell first.");
       return;
     }
-
-    const parameterCells = getParameterCells();
+    var parameterCells = getParameterCells();
     if (parameterCells.length === 0) {
       alert("Please add at least one parameter cell.");
       return;
     }
+    var sideConditions = getSideConditions();
 
     document.getElementById("startBtn").disabled = true;
     document.getElementById("statusText").textContent = "Starting...";
@@ -188,223 +297,208 @@
 
     Asc.scope.parameterCells = parameterCells;
     Asc.scope.targetCell = addr;
+    Asc.scope.sideConditions = sideConditions;
 
     window.Asc.plugin.callCommand(
       function () {
         function getSimpleFormula(addr) {
           var sheet = Api.GetActiveSheet();
           var rng = sheet.GetRange(addr);
-          if (!rng) return null;
-          return rng.GetFormula();
+          return rng ? rng.GetFormula() : null;
         }
-
         function getCellValue(addr) {
           var sheet = Api.GetActiveSheet();
           var rng = sheet.GetRange(addr);
-          if (!rng) return null;
-          return rng.GetValue();
+          return rng ? rng.GetValue() : null;
         }
-
         function normalizeRef(ref) {
           return ref.replace(/\$/g, "");
         }
-
+        function colToNum(col) {
+          var num = 0;
+          for (var i = 0; i < col.length; i++)
+            num = num * 26 + (col.charCodeAt(i) - 64);
+          return num;
+        }
+        function numToCol(num) {
+          var col = "";
+          while (num > 0) {
+            var r = (num - 1) % 26;
+            col = String.fromCharCode(65 + r) + col;
+            num = Math.floor((num - 1) / 26);
+          }
+          return col;
+        }
         function expandRange(rangeStr) {
           var parts = rangeStr.replace(/\$/g, "").split(":");
           if (parts.length !== 2) return [rangeStr.replace(/\$/g, "")];
-          var start = parts[0],
-            end = parts[1];
-          var startMatch = start.match(/([A-Z]+)(\d+)/);
-          var endMatch = end.match(/([A-Z]+)(\d+)/);
-          if (!startMatch || !endMatch) return [rangeStr.replace(/\$/g, "")];
-
-          var startCol = startMatch[1],
-            startRow = parseInt(startMatch[2]);
-          var endCol = endMatch[1],
-            endRow = parseInt(endMatch[2]);
-
-          function colToNum(col) {
-            var num = 0;
-            for (var i = 0; i < col.length; i++) {
-              num = num * 26 + (col.charCodeAt(i) - 64);
-            }
-            return num;
-          }
-          function numToCol(num) {
-            var col = "";
-            while (num > 0) {
-              var remainder = (num - 1) % 26;
-              col = String.fromCharCode(65 + remainder) + col;
-              num = Math.floor((num - 1) / 26);
-            }
-            return col;
-          }
-
-          var startColNum = colToNum(startCol),
-            endColNum = colToNum(endCol);
+          var sm = parts[0].match(/([A-Z]+)(\d+)/),
+            em = parts[1].match(/([A-Z]+)(\d+)/);
+          if (!sm || !em) return [rangeStr.replace(/\$/g, "")];
+          var sc = colToNum(sm[1]),
+            ec = colToNum(em[1]),
+            sr = parseInt(sm[2]),
+            er = parseInt(em[2]);
           var cells = [];
-          for (var c = startColNum; c <= endColNum; c++) {
-            for (var r = startRow; r <= endRow; r++) {
-              cells.push(numToCol(c) + r);
-            }
-          }
+          for (var c = sc; c <= ec; c++)
+            for (var r = sr; r <= er; r++) cells.push(numToCol(c) + r);
           return cells;
         }
-
         function getFullFormula(cell, parameterCells) {
-          var maxIterations = 20;
-          var parameterCellSet = new Set();
-          if (parameterCells && Array.isArray(parameterCells)) {
-            parameterCells.forEach(function (param) {
-              if (param.cell) parameterCellSet.add(normalizeRef(param.cell));
-            });
+          var maxIter = 20;
+          var paramSet = {};
+          if (parameterCells) {
+            for (var p = 0; p < parameterCells.length; p++) {
+              if (parameterCells[p].cell)
+                paramSet[normalizeRef(parameterCells[p].cell)] = true;
+            }
           }
-
           var result = getSimpleFormula(cell);
-          if (!result || !result.startsWith("=")) return result;
-
-          var expandedCells = new Set();
-          expandedCells.add(normalizeRef(cell));
-
-          for (var iteration = 0; iteration < maxIterations; iteration++) {
-            var hasReplacement = false;
-            var cellRefPattern = /\$?[A-Z]+\$?\d+(?::\$?[A-Z]+\$?\d+)?/g;
-            var matches = result.match(cellRefPattern);
+          if (!result || result.indexOf("=") !== 0) return result;
+          var expanded = {};
+          expanded[normalizeRef(cell)] = true;
+          for (var iter = 0; iter < maxIter; iter++) {
+            var hasRepl = false;
+            var matches = result.match(/\$?[A-Z]+\$?\d+(?::\$?[A-Z]+\$?\d+)?/g);
             if (!matches) break;
-
-            var uniqueMatches = [];
-            var seen = new Set();
+            var unique = [],
+              seen = {};
             for (var i = 0; i < matches.length; i++) {
-              var normalized = normalizeRef(matches[i]);
-              if (!seen.has(normalized)) {
-                seen.add(normalized);
-                uniqueMatches.push(matches[i]);
+              var n = normalizeRef(matches[i]);
+              if (!seen[n]) {
+                seen[n] = true;
+                unique.push(matches[i]);
               }
             }
-            uniqueMatches.sort(function (a, b) {
+            unique.sort(function (a, b) {
               return b.length - a.length;
             });
-
-            for (var j = 0; j < uniqueMatches.length; j++) {
-              var match = uniqueMatches[j];
-              var normalizedMatch = normalizeRef(match);
-
-              if (match.includes(":")) {
-                var cells = expandRange(match);
-                var expandedFormulas = [];
+            for (var j = 0; j < unique.length; j++) {
+              var match = unique[j],
+                nm = normalizeRef(match);
+              if (match.indexOf(":") >= 0) {
+                var cells = expandRange(match),
+                  expF = [];
                 for (var k = 0; k < cells.length; k++) {
-                  var cellAddr = cells[k];
-                  if (parameterCellSet.has(cellAddr)) {
-                    expandedFormulas.push(cellAddr);
-                  } else {
-                    var cellFormula = getSimpleFormula(cellAddr);
-                    if (cellFormula && cellFormula.startsWith("=")) {
-                      expandedFormulas.push(
-                        "(" + cellFormula.substring(1) + ")"
-                      );
-                    } else {
-                      expandedFormulas.push(getCellValue(cellAddr));
-                    }
+                  var ca = cells[k];
+                  if (paramSet[ca]) expF.push(ca);
+                  else {
+                    var cf = getSimpleFormula(ca);
+                    expF.push(
+                      cf && cf.indexOf("=") === 0
+                        ? "(" + cf.substring(1) + ")"
+                        : getCellValue(ca)
+                    );
                   }
                 }
-                var replacement = "(" + expandedFormulas.join("+") + ")";
-                var escapedMatch = match
+                var repl = "(" + expF.join("+") + ")";
+                var esc = match
                   .replace(/\$/g, "\\$?")
                   .replace(/:/g, "\\s*:\\s*");
-                var rangePattern = new RegExp(
-                  "SUM\\s*\\(\\s*" + escapedMatch + "\\s*\\)",
-                  "gi"
-                );
-                var newResult = result.replace(rangePattern, replacement);
-                if (newResult !== result) {
-                  result = newResult;
-                  hasReplacement = true;
+                var rp = new RegExp("SUM\\s*\\(\\s*" + esc + "\\s*\\)", "gi");
+                var nr = result.replace(rp, repl);
+                if (nr !== result) {
+                  result = nr;
+                  hasRepl = true;
                 }
                 continue;
               }
-
-              if (parameterCellSet.has(normalizedMatch)) continue;
-              if (expandedCells.has(normalizedMatch)) continue;
-
-              var refFormula = getSimpleFormula(normalizedMatch);
-              if (refFormula && refFormula.startsWith("=")) {
-                expandedCells.add(normalizedMatch);
-                var formulaContent = "(" + refFormula.substring(1) + ")";
-                var col = normalizedMatch.match(/[A-Z]+/)[0];
-                var row = normalizedMatch.match(/\d+/)[0];
-                var refPattern = new RegExp(
+              if (paramSet[nm] || expanded[nm]) continue;
+              var rf = getSimpleFormula(nm);
+              if (rf && rf.indexOf("=") === 0) {
+                expanded[nm] = true;
+                var fc = "(" + rf.substring(1) + ")";
+                var col = nm.match(/[A-Z]+/)[0],
+                  row = nm.match(/\d+/)[0];
+                var rp = new RegExp(
                   "\\$?" + col + "\\$?" + row + "(?![0-9])",
                   "g"
                 );
-                var newResult = result.replace(refPattern, formulaContent);
-                if (newResult !== result) {
-                  result = newResult;
-                  hasReplacement = true;
+                var nr = result.replace(rp, fc);
+                if (nr !== result) {
+                  result = nr;
+                  hasRepl = true;
                 }
               }
             }
-            if (!hasReplacement) break;
+            if (!hasRepl) break;
           }
-
-          var cellRefPattern = /\$?[A-Z]+\$?\d+/g;
-          var matches = result.match(cellRefPattern);
+          var matches = result.match(/\$?[A-Z]+\$?\d+/g);
           if (matches) {
-            var uniqueMatches = [];
-            var seen = new Set();
+            var unique = [],
+              seen = {};
             for (var i = 0; i < matches.length; i++) {
-              var normalized = normalizeRef(matches[i]);
-              if (!seen.has(normalized)) {
-                seen.add(normalized);
-                uniqueMatches.push({
-                  original: matches[i],
-                  normalized: normalized,
-                });
+              var n = normalizeRef(matches[i]);
+              if (!seen[n]) {
+                seen[n] = true;
+                unique.push({ o: matches[i], n: n });
               }
             }
-            uniqueMatches.sort(function (a, b) {
-              return b.normalized.length - a.normalized.length;
+            unique.sort(function (a, b) {
+              return b.n.length - a.n.length;
             });
-
-            for (var j = 0; j < uniqueMatches.length; j++) {
-              var item = uniqueMatches[j];
-              var normalizedRef = item.normalized;
-              if (parameterCellSet.has(normalizedRef)) {
-                var col = normalizedRef.match(/[A-Z]+/)[0];
-                var row = normalizedRef.match(/\d+/)[0];
-                var refPattern = new RegExp(
-                  "\\$?" + col + "\\$?" + row + "(?![0-9])",
-                  "g"
-                );
-                result = result.replace(refPattern, normalizedRef);
+            for (var j = 0; j < unique.length; j++) {
+              var item = unique[j],
+                nr = item.n;
+              var col = nr.match(/[A-Z]+/)[0],
+                row = nr.match(/\d+/)[0];
+              var rp = new RegExp(
+                "\\$?" + col + "\\$?" + row + "(?![0-9])",
+                "g"
+              );
+              if (paramSet[nr]) {
+                result = result.replace(rp, nr);
                 continue;
               }
-              var cellValue = getCellValue(normalizedRef);
-              if (cellValue !== null) {
-                var col = normalizedRef.match(/[A-Z]+/)[0];
-                var row = normalizedRef.match(/\d+/)[0];
-                var refPattern = new RegExp(
-                  "\\$?" + col + "\\$?" + row + "(?![0-9])",
-                  "g"
-                );
-                result = result.replace(refPattern, cellValue);
-              }
+              var cv = getCellValue(nr);
+              if (cv !== null) result = result.replace(rp, cv);
             }
           }
           return result;
         }
-
-        return getFullFormula(Asc.scope.targetCell, Asc.scope.parameterCells);
+        var targetFormula = getFullFormula(
+          Asc.scope.targetCell,
+          Asc.scope.parameterCells
+        );
+        var sideFormulas = [];
+        if (Asc.scope.sideConditions && Asc.scope.sideConditions.length > 0) {
+          for (var i = 0; i < Asc.scope.sideConditions.length; i++) {
+            var sc = Asc.scope.sideConditions[i];
+            var formula = getFullFormula(sc.cell, Asc.scope.parameterCells);
+            sideFormulas.push({
+              cell_formula: formula,
+              min_value: sc.min_value,
+              max_value: sc.max_value,
+              define_min: sc.define_min,
+              define_max: sc.define_max,
+            });
+          }
+        }
+        return { targetFormula: targetFormula, sideConditions: sideFormulas };
       },
       false,
       false,
       function (res) {
         console.log("[RESULT]", res);
-        if (res && window.goParseInput) {
-          var parameterCells = getParameterCells();
-          var paramsJSON = JSON.stringify(parameterCells);
+        if (res && res.targetFormula && window.goParseInput) {
+          var paramsJSON = JSON.stringify(getParameterCells());
+          var sideConditionsJSON = JSON.stringify(res.sideConditions || []);
           try {
             var iterations = getIterations();
-            window.goParseInput(res, paramsJSON, iterations.toString());
+            if (res.sideConditions && res.sideConditions.length > 0) {
+              window.goParseInput(
+                res.targetFormula,
+                paramsJSON,
+                iterations.toString(),
+                sideConditionsJSON
+              );
+            } else {
+              window.goParseInput(
+                res.targetFormula,
+                paramsJSON,
+                iterations.toString()
+              );
+            }
           } catch (err) {
             console.error("[WASM] Error:", err);
             document.getElementById("statusText").textContent = "Error";

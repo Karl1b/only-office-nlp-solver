@@ -16,15 +16,9 @@
       go.run(result.instance);
 
       wasmReady = true;
-      document.getElementById("wasmStatus").textContent =
-        "✓ Go WebAssembly loaded successfully!";
-      document.getElementById("wasmStatus").style.background = "#d4edda";
-      document.getElementById("wasmStatus").style.borderColor = "#c3e6cb";
+
     } catch (err) {
-      document.getElementById("wasmStatus").textContent =
-        "✗ Error loading WASM: " + err.message;
-      document.getElementById("wasmStatus").style.background = "#f8d7da";
-      document.getElementById("wasmStatus").style.borderColor = "#f5c6cb";
+
       console.error("WASM load error:", err);
     }
   }

@@ -1,6 +1,6 @@
 # OnlyOffice NLP Solver
 
-A lightweight nonlinear programming (NLP) solver plugin for OnlyOffice Spreadsheet. Define a target cell and parameter cells with optional bounds, then let the solver find optimal values to minimize your target function.
+A lightweight nonlinear programming (NLP) solver plugin for OnlyOffice Spreadsheet. Define a target cell, side conditions, and parameter cells with optional bounds, then let the solver find optimal values to minimize your target function.
 
 ## Demo
 
@@ -8,7 +8,7 @@ A lightweight nonlinear programming (NLP) solver plugin for OnlyOffice Spreadshe
 
 ## Download
 
-[Download here](https://workupload.com/file/WYN6zT5wYff)
+[Download here](https://workupload.com/file/G2ttRuEgVzT)
 
 Planning to submit this to the OnlyOffice plugin store soon.
 
@@ -16,7 +16,8 @@ Planning to submit this to the OnlyOffice plugin store soon.
 
 1. Select the cell you want to minimize
 2. Select your parameter range (with optional min/max bounds—defaults to -1.0 and 1.0 if unset)
-3. Click **Start**
+3. Select your side conditions (with info if min/max are defined or not)
+4. Click **Start**
 
 ## Examples
 
