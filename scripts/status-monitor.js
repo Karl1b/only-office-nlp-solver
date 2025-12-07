@@ -40,13 +40,9 @@
 
     // Update status class
     statusText.className = "status-value";
-    if (statusStr === "running" || statusStr === "fitting") {
+    if (statusStr === "running") {
       statusText.classList.add("running");
-    } else if (
-      statusStr === "ready" ||
-      statusStr === "done" ||
-      statusStr === "complete"
-    ) {
+    } else if (statusStr === "done") {
       statusText.classList.add("ready");
     } else if (statusStr === "error") {
       statusText.classList.add("error");
@@ -115,11 +111,24 @@
       }
     }
 
-    // Enable/disable start button based on status
-    if (statusStr === "running" || statusStr === "fitting") {
+    // Enable/disable buttons based on status
+    const transferBtn = document.getElementById("transferBtn");
+    if (statusStr === "running") {
       startBtn.disabled = true;
+      transferBtn.disabled = true;
+    } else if (statusStr === "done") {
+      startBtn.disabled = false;
+      transferBtn.disabled = false;
+    } else if ( // Lol. WTF JS? 
+      statusStr === "ready" ||
+      statusStr === "Ready" ||
+      statusStr === "READY"
+    ) {
+      startBtn.disabled = false;
+      transferBtn.disabled = true;
     } else {
       startBtn.disabled = false;
+      transferBtn.disabled = false;
     }
   }
 

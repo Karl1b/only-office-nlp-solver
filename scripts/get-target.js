@@ -516,4 +516,36 @@
       }
     );
   };
+
+  window.transferResults = function () {
+    if (!window.goCheckStatus) return;
+
+    const status = window.goCheckStatus();
+
+    const params = status.current_paramters || [];
+    const parameterCells = getParameterCells();
+
+    if (params.length === 0 || parameterCells.length === 0) {
+      alert("No results to transfer.");
+      return;
+    }
+
+    Asc.scope.transferData = parameterCells.map((p, i) => ({
+      cell: p.cell,
+      value: params[i] !== undefined ? params[i] : 0,
+    }));
+
+    window.Asc.plugin.callCommand(
+      function () {
+        var sheet = Api.GetActiveSheet();
+        var data = Asc.scope.transferData;
+        for (var i = 0; i < data.length; i++) {
+          var rng = sheet.GetRange(data[i].cell);
+          if (rng) rng.SetValue(data[i].value);
+        }
+      },
+      false,
+      true
+    );
+  };
 })();

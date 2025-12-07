@@ -1,14 +1,18 @@
 # OnlyOffice NLP Solver
 
-A lightweight nonlinear programming (NLP) solver plugin for OnlyOffice Spreadsheet. Define a target cell, side conditions, and parameter cells with optional bounds, then let the solver find optimal values to minimize your target function.
+A nonlinear programming (NLP) solver plugin for OnlyOffice Spreadsheet. 
+Define a target cell, side conditions, and parameter cells with optional bounds,
+then let the solver find optimal values to minimize your target function.
 
 ## Demo
 
-![Demo](demo.gif)
+![Demo](demo-solver_550_1077.gif)
 
 ## Download
 
-[Download here](https://workupload.com/file/G2ttRuEgVzT)
+Download on the project page:
+
+[Project page](https://karlbreuer.com/nlp-solver/en)
 
 Planning to submit this to the OnlyOffice plugin store soon.
 
@@ -22,6 +26,8 @@ Planning to submit this to the OnlyOffice plugin store soon.
 ## Examples
 
 Check out `oo-nlp-solver_examples.xlsx` for working examples.
+
+[Examples here](https://karlbreuer.com/nlp-solver/en)
 
 ## Contributing
 

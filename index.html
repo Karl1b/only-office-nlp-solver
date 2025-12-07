@@ -405,6 +405,39 @@
       .condition-violation {
         color: #e74c3c;
       }
+
+      .help-link {
+        margin-left: auto;
+        font-size: 10px;
+        color: #1d3c61 !important;
+        text-decoration: none;
+        padding-right: 10px;
+      }
+      .help-link:hover {
+        text-decoration: underline;
+      }
+
+      .transfer-btn {
+        display: block;
+        width: 100%;
+        padding: 9px 12px;
+        background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%);
+        border: none;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      .transfer-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(39, 174, 96, 0.3);
+      }
+      .transfer-btn:disabled {
+        background: #a0a0a0;
+        cursor: not-allowed;
+      }
     </style>
     <script src="https://onlyoffice.github.io/sdkjs-plugins/v1/plugins.js"></script>
     <script src="scripts/wasm_exec.js"></script>
@@ -419,7 +452,14 @@
         <h1>NLP Solver</h1>
         <span class="author">karlbreuer.com</span>
       </div>
+      <a
+        href="https://karlbreuer.com/nlp-solver/en"
+        target="_blank"
+        class="help-link"
+        >Help page ←</a
+      >
     </div>
+
     <div class="scroll-container" id="scrollContainer">
       <div class="section">
         <div class="target-row">
@@ -495,7 +535,14 @@
       <button class="start-btn" id="startBtn" onclick="startSolver()">
         Start Solver
       </button>
-
+      <button
+        class="transfer-btn"
+        id="transferBtn"
+        onclick="transferResults()"
+        disabled
+      >
+        Transfer Result
+      </button>
       <div class="section status-section" id="statusSection">
         <div class="section-title">Status</div>
         <div class="status-row">
