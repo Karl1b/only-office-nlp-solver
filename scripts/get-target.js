@@ -193,7 +193,7 @@
         <span class="param-label">Cell</span>
         <input type="text" class="condition-cell" placeholder="C1" value="${cellValue}" />
         <button class="param-picker-btn" onclick="pickSideConditionCellForRow('${rowId}')" title="Pick cell from spreadsheet">
-          <svg viewBox="0 0 24 24"><path d="M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm2 0h6v6H5V5zm8 0h6v6h-6V5zm-8 8h6v6H5v-6zm8 0h6v6h-6v-6z"/></svg>
+          <svg viewBox="0 0 26 26"><path d="M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm2 0h6v6H5V5zm8 0h6v6h-6V5zm-8 8h6v6H5v-6zm8 0h6v6h-6v-6z"/></svg>
         </button>
         <button class="remove-btn" onclick="removeSideConditionRow('${rowId}')">×</button>
       </div>
