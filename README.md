@@ -14,7 +14,7 @@ Download on the project page:
 
 [Project page](https://karlbreuer.com/nlp-solver/en)
 
-Planning to submit this to the OnlyOffice plugin store soon.
+Planning to submit this to the OnlyOffice plugin store
 
 ## How to Use
 

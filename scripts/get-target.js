@@ -193,7 +193,7 @@
         <span class="param-label">Cell</span>
         <input type="text" class="condition-cell" placeholder="C1" value="${cellValue}" />
         <button class="param-picker-btn" onclick="pickSideConditionCellForRow('${rowId}')" title="Pick cell from spreadsheet">
-          <svg viewBox="0 0 26 26"><path d="M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm2 0h6v6H5V5zm8 0h6v6h-6V5zm-8 8h6v6H5v-6zm8 0h6v6h-6v-6z"/></svg>
+         +
         </button>
         <button class="remove-btn" onclick="removeSideConditionRow('${rowId}')">×</button>
       </div>
@@ -538,10 +538,44 @@
     window.Asc.plugin.callCommand(
       function () {
         var sheet = Api.GetActiveSheet();
+
+        // Check if user uses . or , for dec seps.
+        
+        var a1 = sheet.GetRange("A1");
+
+        var a1f_old = a1.GetFormula();
+        var a1v_old = a1.GetValue();
+
+        a1.SetValue(1.001);
+        const a1v = a1.GetValue();
+        var needsReplacement = false;
+
+        if (a1v === 1.001 || a1v === "1.001") {
+          needsReplacement = false;
+        } else {
+          needsReplacement = true;
+        }
+
+        // restore A1
+
+        if (a1f_old) {
+          a1.SetValue(a1f_old);
+        } else if (a1v_old) {
+          a1.SetValue(a1v_old);
+        } else {
+          a1.SetValue("");
+        }
+
         var data = Asc.scope.transferData;
         for (var i = 0; i < data.length; i++) {
           var rng = sheet.GetRange(data[i].cell);
-          if (rng) rng.SetValue(data[i].value);
+          if (rng) {
+            if (needsReplacement) {
+              rng.SetValue(data[i].value.toString().replace(".", ","));
+            } else {
+              rng.SetValue(data[i].value);
+            }
+          }
         }
       },
       false,

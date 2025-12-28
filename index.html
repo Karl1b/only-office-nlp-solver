@@ -17,31 +17,30 @@
         color: #333;
         font-size: 12px;
         min-width: 160px;
-        height: 100%;
+        height: 100vh;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
+      }
+      .scroll-container {
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0;
       }
       .header {
-        position: sticky;
-        top: 0;
-        z-index: 10;
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 8px;
-        padding-top: 10px;
-        padding-left: 10px;
+        padding-top: 1px;
+        padding-left: 9px;
+        padding-bottom: 1px;
         border-bottom: 1px solid #e0e0e0;
         background-color: white;
-      }
-      .scroll-container {
-        max-height: 750px;
-        overflow-y: auto;
-        flex: 1;
+        flex-shrink: 0;
       }
       .header img {
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
         flex-shrink: 0;
       }
       .header-text h1 {
@@ -54,7 +53,7 @@
         color: #1c1c9d;
       }
       .section {
-        margin-bottom: 5px;
+        margin-bottom: 0px;
         padding: 3px;
         background: white;
         border: 1px solid #e0e0e0;
@@ -116,7 +115,7 @@
         width: 26px;
         height: 26px;
         padding: 0;
-        background: #446995;
+        background: #27ae60;
         border: none;
         color: white;
         border-radius: 4px;
@@ -192,7 +191,7 @@
         width: 22px;
         height: 22px;
         padding: 0;
-        background: #446995;
+        background: #27ae60;
         border: none;
         color: white;
         border-radius: 3px;
@@ -208,11 +207,7 @@
       .param-picker-btn:hover {
         background: #3a5a80;
       }
-      .param-picker-btn svg {
-        width: 12px;
-        height: 12px;
-        fill: currentColor;
-      }
+
       .param-bounds-row input[type="checkbox"] {
         width: 14px;
         height: 14px;
@@ -388,7 +383,6 @@
       .hidden {
         display: none;
       }
-
       .side-conditions-display {
         font-family: monospace;
         font-size: 14px;
@@ -405,7 +399,6 @@
       .condition-violation {
         color: #e74c3c;
       }
-
       .help-link {
         margin-left: auto;
         font-size: 10px;
@@ -416,7 +409,6 @@
       .help-link:hover {
         text-decoration: underline;
       }
-
       .transfer-btn {
         display: block;
         width: 100%;
@@ -446,21 +438,21 @@
     <script src="scripts/status-monitor.js"></script>
   </head>
   <body>
-    <div class="header">
-      <img src="icons/logo.png" alt="NLP Solver" />
-      <div class="header-text">
-        <h1>NLP Solver</h1>
-        <span class="author">karlbreuer.com</span>
-      </div>
-      <a
-        href="https://karlbreuer.com/nlp-solver/en"
-        target="_blank"
-        class="help-link"
-        >Help page ←</a
-      >
-    </div>
-
     <div class="scroll-container" id="scrollContainer">
+      <div class="header">
+        <img src="resources/light/icon.png" alt="NLP Solver" />
+        <div class="header-text">
+          <h1>NLP Solver</h1>
+          <span class="author">karlbreuer.com</span>
+        </div>
+        <a
+          href="https://karlbreuer.com/nlp-solver/en"
+          target="_blank"
+          class="help-link"
+          >Help page ←</a
+        >
+      </div>
+
       <div class="section">
         <div class="target-row">
           <span class="target-label">Target</span>
@@ -476,11 +468,7 @@
             onclick="pickTargetCell()"
             title="Pick cell from spreadsheet"
           >
-            <svg viewBox="0 0 26 26">
-              <path
-                d="M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm2 0h6v6H5V5zm8 0h6v6h-6V5zm-8 8h6v6H5v-6zm8 0h6v6h-6v-6z"
-              />
-            </svg>
+            +
           </button>
         </div>
       </div>
@@ -493,11 +481,7 @@
             onclick="pickParameterRange()"
             title="Pick cells from spreadsheet"
           >
-            <svg viewBox="0 0 26 26">
-              <path
-                d="M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm2 0h6v6H5V5zm8 0h6v6h-6V5zm-8 8h6v6H5v-6zm8 0h6v6h-6v-6z"
-              />
-            </svg>
+            +
           </button>
         </div>
         <div id="parametersList"></div>
